@@ -1,10 +1,8 @@
 name: NTFY
-
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
-
 jobs:
   Notify:
     runs-on: ubuntu-latest
