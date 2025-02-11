@@ -1,0 +1,34 @@
+services:
+  app.ntfy:
+    image: binwiederhier/ntfy
+    container_name: ${app_name:-ntfy}
+    hostname: ${app_name:-ntfy}
+    command:
+      - serve
+    environment:
+      - TZ=Europe/Berlin    # optional: Change to your desired timezone
+      - NTFY_BASE_URL=${app_base_url}
+      - NTFY_AUTH_FILE=/var/ntfy/user.db
+      - NTFY_AUTH_DEFAULT_ACCESS=deny-all
+      - NTFY_BEHIND_PROXY=true
+      - NTFY_ENABLE_LOGIN=false
+      - NTFY_UPSTREAM_BASE_URL=${upstream_url:-https://ntfy.sh}
+   # user: 0:0 # optional: Set custom user/group or uid/gid
+    volumes:
+      - lib:/var/ntfy/
+#      - ./ntfy:/etc/ntfy
+#    ports:
+#      - 80:80
+    restart: ${restart_mode:-unless-stopped}
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+volumes:
+  lib:
+    name: ntfy.lib
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
