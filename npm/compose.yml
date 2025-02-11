@@ -1,0 +1,31 @@
+services:
+  app.npm:
+    container_name: ${app_name}
+    hostname: ${app_name}
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80' # Public HTTP Port
+      #- '81:81' # Public Admin Interface port | dont have that one public
+      - '443:443' # Public HTTPS Port
+    volumes:
+      - data:/data
+      - certs:/etc/letsencrypt
+    environment:
+      INITIAL_ADMIN_EMAIL: ${admin_email} # default admin@example.com
+      INITIAL_ADMIN_PASSWORD: ${admin_password} #default changeme
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+volumes:
+  data:
+    name: npm.data
+  certs:
+    name: npm.certs
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
+
