@@ -1,0 +1,18 @@
+name: NTFY
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  Notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Actions Ntfy
+        run: |
+          curl ${{ secrets.NTFY_URL }} \
+          -u ${{ secrets.NTFY_TOKEN }} \
+          -H "Title: PUSH COMPLETE" \
+          -H "Content-Type: text/plain" \
+          -d $'Repo: ${{ github.repository }} \nCommit: ${{ github.sha }} \nRef: ${{ github.ref }} \nStatus: ${{ job.status}}'
