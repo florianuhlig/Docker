@@ -1,0 +1,54 @@
+services:
+  app.wiki:
+    container_name: ${app_name:-wikijs_app}
+    hostname: ${app_name:-wikijs_app}
+    image: ghcr.io/requarks/wiki:latest
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: ${db_name:-wikijs_db}
+      DB_PORT: 5432
+      DB_USER: ${db_username:-user}
+      DB_PASS: ${db_password:-password}
+      DB_NAME: ${db_databse:-database}
+    restart: unless-stopped
+    #ports:
+    #  - "80:3000"
+    volumes:
+      - app_data:/wiki/data/content
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+    depends_on:
+      db.wiki:
+        condition: service_healthy
+
+  db.wiki:
+    container_name: ${db_name:-wikijs_db}
+    hostname: ${db_name:-wikijs_db}
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${db_password:-password}
+      POSTGRES_USER: ${db_username:-user}
+      POSTGRES_DATABASE: ${db_databse:-database}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      net:
+        ipv4_address: ${db_ipv4}
+
+volumes:
+  app_data:
+    name: wiki.app.data
+  db_data:
+    name: wiki.db.data
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
