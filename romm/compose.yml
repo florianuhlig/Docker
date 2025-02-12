@@ -1,0 +1,49 @@
+services:
+  app.romm:
+    image: rommapp/romm:latest
+    container_name: ${app_name:-app_romm}
+    environment:
+      - DB_HOST=${db_name:-db_romm}
+      - DB_NAME=${db_database:-default}
+      - DB_USER=${db_user:-default}
+      - DB_PASSWD=${db_password:-default}
+      - IGDB_CLIENT_ID=${igdb_client_id}
+      - IGDB_CLIENT_SECRET=${igdb_client_secret}
+      - ROMM_AUTH_SECRET_KEY=${romm_auth_secret}
+    volumes:
+      - romm_data:/romm/
+      - romm_redis:/redis-data
+#    ports:
+#      - 8000:8080
+    depends_on:
+      - db.romm
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+  db.romm:
+    image: mariadb:latest
+    container_name: ${db_name:-db_romm}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${db_root_password:-rootpassword}
+      - MYSQL_DATABASE=${db_database:-defualt}
+      - MYSQL_USER=${db_user:-default}
+      - MYSQL_PASSWORD=${db_password:-default}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      net:
+        ipv4_address: ${db_ipv4}
+
+volumes:
+  mysql_data:
+    name: romm.db
+  romm_data:
+    name: romm.data
+  romm_redis:
+    name: romm.redis
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
