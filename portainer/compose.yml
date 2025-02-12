@@ -1,0 +1,23 @@
+services:
+  app.portainer:
+    container_name: ${app_name}
+    hostname: ${app_name}
+    image: portainer/portainer-ce:latest
+    #ports:
+    #  - 9443:9443
+    volumes:
+      - data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+volumes:
+  data:
+    name: portainer.data
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
