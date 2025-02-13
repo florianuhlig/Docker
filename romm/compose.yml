@@ -11,12 +11,16 @@ services:
       - IGDB_CLIENT_SECRET=${igdb_client_secret}
       - ROMM_AUTH_SECRET_KEY=${romm_auth_secret}
     volumes:
-      - romm_data:/romm/
       - romm_redis:/redis-data
+      - romm_assets:/romm/assets
+      - romm_config:/romm/config
+      - romm_libary:/romm/library
+      - romm_resources:/romm/resources
 #    ports:
 #      - 8000:8080
     depends_on:
-      - db.romm
+      db.romm:
+        condition: service_healthy
     networks:
       net:
         ipv4_address: ${app_ipv4}
@@ -31,6 +35,12 @@ services:
       - MYSQL_PASSWORD=${db_password:-default}
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       net:
         ipv4_address: ${db_ipv4}
@@ -38,10 +48,16 @@ services:
 volumes:
   mysql_data:
     name: romm.db
-  romm_data:
-    name: romm.data
   romm_redis:
     name: romm.redis
+  romm_assets:
+    name: romm.assets
+  romm_config:
+    name: romm.config
+  romm_libary:
+    name: romm.libary
+  romm_resources:
+    name: romm.resources
 
 networks:
   net:
