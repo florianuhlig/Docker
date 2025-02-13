@@ -9,6 +9,7 @@ services:
       - DB_PASSWD=${db_password:-default}
       - IGDB_CLIENT_ID=${igdb_client_id}
       - IGDB_CLIENT_SECRET=${igdb_client_secret}
+      - STEAMGRIDDB_API_KEY=${steamgriddb_api_key}
       - ROMM_AUTH_SECRET_KEY=${romm_auth_secret}
     volumes:
       - romm_redis:/redis-data
