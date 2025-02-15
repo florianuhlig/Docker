@@ -16,7 +16,7 @@ services:
       - /etc/localtime:/etc/localtime:ro # Just to make the time right
     stdin_open: true
     tty: true
-    restart: unless-stopped
+    restart: never
     networks:
       net:
         ipv4_address: ${app_ipv4}
