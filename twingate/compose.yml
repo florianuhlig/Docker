@@ -10,7 +10,7 @@ services:
       - TWINGATE_NETWORK=${twingate_network}
       - TWINGATE_ACCESS_TOKEN=${con01_access_token}
       - TWINGATE_REFRESH_TOKEN=${con01_refresh_token}
-      - TWINGATE_LOG_LEVEL=7
+      #- TWINGATE_LOG_LEVEL=7
     sysctls:
       net.ipv4.ping_group_range: "0 2147483647"
     networks:
@@ -28,7 +28,7 @@ services:
       - TWINGATE_NETWORK=${twingate_network}
       - TWINGATE_ACCESS_TOKEN=${con02_access_token}
       - TWINGATE_REFRESH_TOKEN=${con02_refresh_token}
-      - TWINGATE_LOG_LEVEL=7
+      #- TWINGATE_LOG_LEVEL=7
     sysctls:
       net.ipv4.ping_group_range: "0 2147483647"
     networks:
