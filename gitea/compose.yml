@@ -1,0 +1,65 @@
+services:
+  app.gitea:
+    image: docker.io/gitea/gitea:1.23.1
+    container_name: ${app_name}
+    hostname: ${app_name}
+    environment:
+      ### User mapping
+      - USER_UID=1000
+      - USER_GID=1000
+      ### Server settings
+      - GITEA__server__DOMAIN=${server_domain}
+      - GITEA__server__SSH_DOMAIN=${server_domain}
+      - GITEA__server__ROOT_URL=${server_root_url}
+      ### Databse settings
+      - GITEA__database__PATH=${db_path}
+      - GITEA__database__DB_TYPE=${db_type}
+      - GITEA__database__DB_HOST=${db_host}
+      - GITEA__database__DB_NAME=${db_name}
+      - GITEA__database__DB_USER=${db_user}
+      ### Mail settings
+      - GITEA__mailer__ENABLED=true
+      - GITEA__mailer__SMTP_ADDR=${smtp_server}
+      - GITEA__mailer__SMTP_PORT=${smtp_port}
+      - GITEA__mailer__FROM=${smtp_from}
+      - GITEA__mailer__USER=${smtp_username}
+      - GITEA__mailer__PASSWD=${smtp_password}
+      ### Service settings
+      - GITEA__service__NO_REPLY_ADDRESS=${service_no_reply_address}
+    restart: unless-stopped
+    volumes:
+      - data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+#      - "3000:3000"  # for web
+      - "2222:22"   # for ssh
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+  runner01.gitea:
+    container_name: ${runner01_name}
+    hostname: ${runner01_name}
+    image: gitea/act_runner
+    restart: unless-stopped
+    environment:
+      GITEA_INSTANCE_URL: ${runner_instance_url}
+      GITEA_RUNNER_REGISTRATION_TOKEN: ${runner01_token}
+    volumes:
+      - runner01:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      net:
+        ipv4_address: ${runner01_ipv4}
+
+volumes:
+  data:
+    name: gitea.data
+  runner01:
+    name: gitea.runner01
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
