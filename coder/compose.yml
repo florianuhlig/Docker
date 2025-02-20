@@ -1,0 +1,55 @@
+services:
+  coder:
+    container_name: app.coder
+    image: ghcr.io/coder/coder:${CODER_VERSION:-latest}
+    #ports:
+    #  - "3000:7080"
+    user: 0:0
+    environment:
+      CODER_PG_CONNECTION_URL: "postgresql://${POSTGRES_USER:-username}:${POSTGRES_PASSWORD:-password}@database/${POSTGRES_DB:-coder}?sslmode=disable"
+      CODER_HTTP_ADDRESS: "0.0.0.0:7080"
+      CODER_ACCESS_URL: "${CODER_ACCESS_URL}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - coder_home:/home/coder
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      net:
+        ipv4_address: 192.168.0.14
+
+  database:
+    container_name: db.coder
+    image: "postgres:16"
+    #ports:
+    #  - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-username} # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password} # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB: ${POSTGRES_DB:-coder} # The PostgreSQL default database (automatically created at first launch)
+    volumes:
+      - coder_data:/var/lib/postgresql/data # Use "docker volume rm coder_coder_data" to reset Coder
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-username} -d ${POSTGRES_DB:-coder}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      net:
+        ipv4_address: 192.168.0.15
+
+volumes:
+  coder_data:
+    name: coder.data
+  coder_home:
+    name: coder.home
+
+networks:
+  net:
+    name: docker_public
+    external: true
