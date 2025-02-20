@@ -1,0 +1,106 @@
+services:
+  app.cloud:
+    image: nextcloud
+    container_name: ${app_name}
+    hostname: ${app_name}
+    restart: ${restart_mode}
+    depends_on:
+      db.cloud:
+        condition: service_healthy
+      redis.cloud:
+        condition: service_healthy
+    #ports:
+    #  - 80:80
+    volumes:
+      - data:/var/www/html
+      - ./post-installation:/docker-entrypoint-hooks.d/post-installation
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${timezone}
+      ### Database
+      - MYSQL_DATABASE=${db_database}
+      - MYSQL_USER=${db_user}
+      - MYSQL_PASSWORD=${db_password}
+      - MYSQL_HOST=${db_name}
+      ### Redis
+      - REDIS_HOST=${redis_name}
+      ### Admin user
+      - NEXTCLOUD_ADMIN_USER=${cloud_admin_user}
+      - NEXTCLOUD_ADMIN_PASSWORD=${cloud_admin_password}
+      ### SMTP
+      - SMTP_HOST=${smtp_host}
+      - SMTP_SECURE=ssl
+      - SMTP_PORT=465
+      - SMTP_AUTHTYPE=LOGIN
+      - SMTP_NAME=${smtp_username}
+      - SMTP_PASSWORD=${smtp_password}
+      - MAIL_FROM_ADDRESS=${smtp_name}
+      - MAIL_DOMAIN=${smtp_domain}
+      ### Server settings
+      - NEXTCLOUD_TRUSTED_DOMAINS=${cloud_trusted_domains}
+      - NEXTCLOUD_INIT_HTACCESS="occ maintenance:update:htaccess"
+      - NEXTCLOUD_UPDATE=1
+      - APACHE_DISABLE_REWRITE_IP=1
+      - TRUSTED_PROXIES=${cloud_proxies}
+      - OVERWRITEPROTOCOL=https
+      - OVERWRITECLIURL=${cloud_overwritecliurl}
+      - PHP_MEMORY_LIMIT=4096m
+      - PHP_UPLOAD_LIMIT=1024m
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+  db.cloud:
+    image: mariadb:10.6
+    container_name: ${db_name}
+    hostname: ${db_name}
+    restart: ${restart_mode}
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${timezone}
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_PASSWORD=${db_password}
+      - MYSQL_DATABASE=${db_database}
+      - MYSQL_USER=${db_user}
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "--user=${db_user}", "--password=${db_password}", "--host=localhost"]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+    networks: 
+      net:
+        ipv4_address: ${db_ipv4}
+
+  redis.cloud:
+    container_name: ${redis_name}
+    hostname: ${redis_name}
+    image: redis:alpine
+    restart: ${restart_mode}
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 30s
+      timeout: 20s
+      retries: 10  
+    networks: 
+      net:
+        ipv4_address: ${redis_ipv4}
+
+volumes:
+  data:
+    name: cloud.data
+  db:
+    name: cloud.db
+  redis:
+    name: cloud.redis
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
