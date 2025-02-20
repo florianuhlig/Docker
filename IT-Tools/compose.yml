@@ -1,0 +1,15 @@
+services:
+  app.craft:
+    container_name: ${app_name}
+    image: corentinth/it-tools
+    #ports:
+    # - 80:80
+    restart: ${restart}
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+networks:
+  net:
+    name: ${network_name}
+    external: true

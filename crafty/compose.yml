@@ -12,7 +12,7 @@ services:
         - "25000:25000" # My Server
         - "25500-25510:25500-25510" # MC SERV PORT RANGE
     volumes:
-        - ./backups:/crafty/backups
+        - backups:/crafty/backups
         - ./docker/logs:/crafty/logs
         - ./docker/servers:/crafty/servers
         - ./docker/config:/crafty/app/config
@@ -20,6 +20,10 @@ services:
     networks:
       net:
         ipv4_address: 192.168.0.20
+
+volumes:
+  backups:
+    name: crafty.backups
 
 networks:
   net:
