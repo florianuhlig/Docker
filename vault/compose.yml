@@ -1,0 +1,33 @@
+services:
+  app.vault:
+    container_name: ${app_name}
+    hostname: ${app_name}
+    image: vaultwarden/server:latest
+    environment:
+      - DOMAIN=${DOMAIN}
+      - SIGNUPS_ALLOWED=false
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - ORG_CREATION_USERS=${ORG_CREATION_USERS}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_SECURITY=force_tls
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    volumes:
+      - data:/data
+    restart: always
+    #ports:
+      #- 80:80
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+volumes:
+  data:
+    name: vault.data
+
+networks:
+  net:
+    name: ${network}
+    external: true
