@@ -1,0 +1,22 @@
+services:
+  prometheus:
+    container_name: ${app_name}
+    image: prom/prometheus:latest
+    restart: ${restart}
+    #ports:
+      #- 9090:9090
+    volumes:
+      - ./config:/etc/prometheus
+      - data:/prometheus
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+volumes:
+  data:
+    name: prometheus.name
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
