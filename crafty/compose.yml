@@ -9,8 +9,7 @@ services:
 #        - "8443:8443" # HTTPS
 #        - "8123:8123" # DYNMAP
 #        - "19132:19132/udp" # BEDROCK
-        - "25000:25000" # My Server
-        - "25500-25510:25500-25510" # MC SERV PORT RANGE
+        - 25000-25010:25000-25010 # MC SERVER PORT RANGE
     volumes:
         - backups:/crafty/backups
         - ./docker/logs:/crafty/logs
