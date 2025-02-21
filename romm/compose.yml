@@ -19,6 +19,7 @@ services:
       - romm_resources:/romm/resources
 #    ports:
 #      - 8000:8080
+    restart: unless-stopped
     depends_on:
       db.romm:
         condition: service_healthy
@@ -34,6 +35,7 @@ services:
       - MYSQL_DATABASE=${db_database:-defualt}
       - MYSQL_USER=${db_user:-default}
       - MYSQL_PASSWORD=${db_password:-default}
+    restart: unless-stopped
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
