@@ -5,6 +5,7 @@ services:
     #ports:
     #  - "3000:7080"
     user: 0:0
+    restart: unless-stopped
     environment:
       CODER_PG_CONNECTION_URL: "postgresql://${POSTGRES_USER:-username}:${POSTGRES_PASSWORD:-password}@database/${POSTGRES_DB:-coder}?sslmode=disable"
       CODER_HTTP_ADDRESS: "0.0.0.0:7080"
@@ -22,6 +23,7 @@ services:
   database:
     container_name: db.coder
     image: "postgres:16"
+    restart: unless-stopped
     #ports:
     #  - "5432:5432"
     environment:
