@@ -1,0 +1,53 @@
+services:
+  app:
+    image: lscr.io/linuxserver/bookstack:${app_version:-latest}
+    container_name: ${abb_name:-app.bookstack}
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - APP_URL=${app_url:-https://localhost:6875}
+      - APP_KEY=${app_key}
+      - DB_HOST=${db_name:-db.bookstack}
+      - DB_PORT=3306
+      - DB_USERNAME=${db_user:-bookstack}
+      - DB_PASSWORD=${db_password:-password}
+      - DB_DATABASE=${db_database:-bookstack}
+    volumes:
+      - app:/config
+    #ports:
+      #- 6875:80
+    restart: ${restart:-unless-stopped}
+    depends_on:
+      - db
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+  db:
+    image: lscr.io/linuxserver/mariadb
+    container_name: ${db_name:-db.bookstack}
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=${db_root_password:-passwordroot}
+      - TZ=${timezone:-Europe/Berlin}
+      - MYSQL_DATABASE=${db_database:-bookstack}
+      - MYSQL_USER=${db_user:-bookstack}
+      - MYSQL_PASSWORD=${db_password:-password}
+    volumes:
+      - db:/config
+    restart: ${restart:-unless-stopped}
+    networks:
+      net:
+        ipv4_address: ${db_ipv4}
+
+volumes:
+  db:
+    name: bookstack.db
+  app:
+    name: bookstack.app
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
