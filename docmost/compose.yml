@@ -1,0 +1,65 @@
+services:
+  docmost:
+    container_name: ${app_name:-app}
+    image: docmost/docmost:latest
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_URL: ${app_url:-http://localhost:3000}
+      APP_SECRET: ${app_secret:-mhLMEYpfCXe7YiYYO89cFtHMfjGkoYqp}
+      DATABASE_URL: 'postgresql://${db_user}:${db_password}@${db_name}:5432/${db_database}?schema=public'
+      REDIS_URL: 'redis://${redis_name:-redis}:6379'
+      MAIL_DRIVER: ${MAIL_DRIVER}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_SECURE: ${SMTP_SECURE}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME}
+    #ports:
+      #- "3000:3000"
+    restart: ${restart_mode}
+    volumes:
+      - docmost:/app/data/storage
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+  db:
+    container_name: ${db_name:-db}
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${db_database:-docmost}
+      POSTGRES_USER: ${db_user:-docmost}
+      POSTGRES_PASSWORD: ${db_password:-STRONG_DB_PASSWORD}
+    restart: ${restart_mode}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      net:
+        ipv4_address: ${db_ipv4}
+
+  redis:
+    container_name: ${redis_name:-redis}
+    image: redis:7.2-alpine
+    restart: ${restart_mode}
+    volumes:
+      - redis_data:/data
+    networks:
+      net:
+        ipv4_address: ${redis_ipv4}
+
+volumes:
+  docmost:
+    name: ${app_volume:-app}
+  db_data:
+    name: ${db_volume:-db}
+  redis_data:
+    name: ${redis_volume:-redis}
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
