@@ -1,0 +1,61 @@
+services:
+  app.joplin:
+    container_name: ${app_name:-joplin_app}
+    hostname: ${app_name:-joplin_app}
+    image: joplin/server:latest
+    depends_on:
+      db.joplin:
+        condition: service_healthy
+    #ports:
+      #- "22300:22300"
+    restart: unless-stopped
+    environment:
+      - APP_PORT=22300
+      - APP_BASE_URL=${app_base_url}
+      - DB_CLIENT=pg
+      - POSTGRES_USER=${db_username:-user}
+      - POSTGRES_PASSWORD=${db_password:-password}
+      - POSTGRES_DATABASE=${db_database:-database}
+      - POSTGRES_HOST=${db_host:-joplin_db}
+      - POSTGRES_PORT=5432
+      - MAILER_ENABLED=1
+      - MAILER_HOST=${smtp_host}
+      - MAILER_PORT=%{smtp_port}
+      - MAILER_SECURE=1
+      - MAILER_AUTH_USER=${smtp_username}
+      - MAILER_AUTH_PASSWORD=${smtp_password}
+      - MAILER_NOREPLY_NAME=${smtp_name}
+      - MAILER_NOREPLY_EMAIL=${smtp_email}
+    networks:
+      net:
+        ipv4_address: ${app_ipv4}
+
+  db.joplin:
+    container_name: ${db_name}
+    hostname: ${db_name}
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${db_password}
+      POSTGRES_USER: ${db_username}
+      POSTGRES_DATABSE: ${db_database}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      net:
+        ipv4_address: ${db_ipv4}
+
+networks:
+  net:
+    name: ${network_name}
+    external: true
+
+volumes:
+  db_data:
+    name: notes.db.data
+    external: true
