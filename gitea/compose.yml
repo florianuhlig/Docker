@@ -38,26 +38,9 @@ services:
       net:
         ipv4_address: ${app_ipv4}
 
-  runner01.gitea:
-    container_name: ${runner01_name}
-    hostname: ${runner01_name}
-    image: gitea/act_runner
-    restart: unless-stopped
-    environment:
-      GITEA_INSTANCE_URL: ${runner_instance_url}
-      GITEA_RUNNER_REGISTRATION_TOKEN: ${runner01_token}
-    volumes:
-      - runner01:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      net:
-        ipv4_address: ${runner01_ipv4}
-
 volumes:
   data:
     name: gitea.data
-  runner01:
-    name: gitea.runner01
 
 networks:
   net:

@@ -72,7 +72,7 @@ services:
       interval: 30s
       timeout: 20s
       retries: 10
-    networks: 
+    networks:
       net:
         ipv4_address: ${db_ipv4}
 
@@ -87,8 +87,8 @@ services:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       interval: 30s
       timeout: 20s
-      retries: 10  
-    networks: 
+      retries: 10
+    networks:
       net:
         ipv4_address: ${redis_ipv4}
 
