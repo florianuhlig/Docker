@@ -1,5 +1,5 @@
 services:
-  app.craft:
+  app.it-tools:
     container_name: ${app_name}
     image: corentinth/it-tools
     #ports:
